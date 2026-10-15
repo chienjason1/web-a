@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>精選合作案例 | 洛和整合行銷 Raul Media</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ref: {
+              bg: '#0e0e10',
+              card: '#161619',
+              cardHover: '#1c1c21',
+              border: '#242429',
+              borderHover: '#caa062',
+              gold: '#caa062',
+              goldHover: '#dfb77b',
+              goldText: '#d8aa6b',
+              pillDark: '#1c1c20',
+              pillDarkHover: '#282830'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', '"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          boxShadow: {
+            'gold-glow': '0 0 35px -5px rgba(202, 160, 98, 0.22)',
+            'card-hover': '0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 25px -4px rgba(202, 160, 98, 0.18)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e0e10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272f;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #caa062;
+    }
+
+    /* Card Micro-interactions */
+    .pure-case-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.125rem;
+      background-color: #151518;
+      border: 1px solid #232328;
+      cursor: pointer;
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.4s ease,
+                  box-shadow 0.45s ease;
+    }
+
+    .pure-case-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(202, 160, 98, 0.65);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 28px -4px rgba(202, 160, 98, 0.22);
+    }
+
+    .pure-case-card img {
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.45s ease;
+    }
+
+    .pure-case-card:hover img {
+      transform: scale(1.07);
+      filter: contrast(106%) brightness(108%);
+    }
+
+    /* Expand glyph animations */
+    .expand-glyph {
+      opacity: 0;
+      transform: scale(0.7);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pure-case-card:hover .expand-glyph {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Item Transition animations */
+    .case-item {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .case-item.is-hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="bg-ref-bg text-[#eaeaea] font-sans antialiased selection:bg-ref-gold selection:text-black min-h-screen py-12 sm:py-20 flex flex-col justify-between">
+
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-8 lg:px-12">
+    
+    <!-- Top Branding Header -->
+    <header class="mb-10 sm:mb-12">
+      <!-- Subtitle Tag -->
+      <div class="flex items-center gap-2 mb-2.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-ref-gold animate-pulse"></span>
+        <span class="text-xs sm:text-sm font-semibold tracking-widest uppercase text-ref-goldText">
+          案例分享 • PORTFOLIO
+        </span>
+      </div>
+
+      <!-- Main Title Row with Book/Journal Icon -->
+      <div class="flex items-center gap-3.5 mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-[#18181c] border border-[#2c2c34] flex items-center justify-center shrink-0 text-[#a0a0ab] shadow-inner shadow-black/60 group-hover:border-ref-gold transition-colors">
+          <svg class="w-5 h-5 stroke-current stroke-[1.7]" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <line x1="9" y1="7" x2="15" y2="7"></line>
+            <line x1="9" y1="11" x2="13" y2="11"></line>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
+            精選合作案例
+          </h1>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5" id="filters-container">
+        <button type="button" data-filter="all" class="filter-btn active-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">全部</button>
+        <button type="button" data-filter="digital" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">數位廣告</button>
+        <button type="button" data-filter="kol" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">網紅合作</button>
+        <button type="button" data-filter="ooh" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">戶外廣告</button>
+        <button type="button" data-filter="social" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">社群經營</button>
+        <button type="button" data-filter="offline" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">線下活動</button>
+        <button type="button" data-filter="overseas" class="filter-btn default-tab px-5 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200">海外案例</button>
+      </div>
+    </header>
+
+    <section id="cases-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+      
+      <!-- Card 1: 信長之野望 霸道 -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="0"
+               data-title="信長之野望 霸道" 
+               data-category="digital kol overseas" 
+               data-tags="數位廣告, 網紅合作, 海外案例"
+               data-src="https://raul.media/airo-assets/images/cases/case-1-image">
+        <img src="https://raul.media/airo-assets/images/cases/case-1-image" 
+             alt="信長之野望 霸道 行銷企劃" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=信長之野望+霸道';"
+             class="w-full h-full object-cover">
+        
+        <!-- Gradient Overlay & Expand Icon -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">Gaming / Global Marketing</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">信長之野望 霸道</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2: KANEBO 佳麗寶 -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="1"
+               data-title="KANEBO 佳麗寶 - 品牌煥新活動" 
+               data-category="social kol" 
+               data-tags="社群經營, 網紅合作"
+               data-src="https://raul.media/airo-assets/images/cases/outdoor-billboard">
+        <img src="https://raul.media/airo-assets/images/cases/outdoor-billboard" 
+             alt="KANEBO 佳麗寶" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=KANEBO+佳麗寶';"
+             class="w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">Beauty & Cosmetics</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">KANEBO 佳麗寶</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 3: 高爾夫指標數位聯播 -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="2"
+               data-title="高爾夫指標數位聯播網" 
+               data-category="ooh" 
+               data-tags="戶外廣告, 獨家媒體聯播"
+               data-src="https://raul.media/airo-assets/images/cases/metro-ads">
+        <img src="https://raul.media/airo-assets/images/cases/metro-ads" 
+             alt="高爾夫指標數位聯播" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=高爾夫指標數位聯播';"
+             class="w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">OOH & Digital Signage</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">高爾夫指標數位聯播</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 4: 零～紅蝶～ REMAKE -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="3"
+               data-title="零～紅蝶～ REMAKE" 
+               data-category="digital ooh" 
+               data-tags="數位廣告, 戶外廣告"
+               data-src="https://raul.media/airo-assets/images/cases/influencer-marketing">
+        <img src="https://raul.media/airo-assets/images/cases/influencer-marketing" 
+             alt="零～紅蝶～ REMAKE" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=零～紅蝶～+REMAKE';"
+             class="w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">Game Release & Launch</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">零～紅蝶～ REMAKE</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 5: 京都幻都 －櫻花幻舞－ -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="4"
+               data-title="京都幻都 －櫻花幻舞－" 
+               data-category="overseas offline" 
+               data-tags="海外案例, 線下活動"
+               data-src="https://raul.media/airo-assets/images/cases/digital-media">
+        <img src="https://raul.media/airo-assets/images/cases/digital-media" 
+             alt="京都幻都 －櫻花幻舞－" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=京都幻都+櫻花幻舞';"
+             class="w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">Japan Cultural Exhibition</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">京都幻都 －櫻花幻舞－</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 6: 仁王3 (NioH 3) 台北電玩展 -->
+      <article class="case-item pure-case-card aspect-[16/10] group" 
+               data-id="5"
+               data-title="仁王3 台北國際電玩展 (TGS)" 
+               data-category="offline digital" 
+               data-tags="線下活動, 數位廣告"
+               data-src="https://raul.media/airo-assets/images/cases/kol-collab">
+        <img src="https://raul.media/airo-assets/images/cases/kol-collab" 
+             alt="仁王3 台北電玩展特設展位" 
+             loading="lazy"
+             onerror="this.onerror=null; this.src='https://placehold.co/1200x750/151518/caa062?text=仁王3+台北電玩展';"
+             class="w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity flex flex-col justify-between p-5 pointer-events-none">
+          <div class="flex justify-end">
+            <div class="expand-glyph w-10 h-10 rounded-full bg-black/80 backdrop-blur-md border border-ref-gold/70 text-ref-gold flex items-center justify-center shadow-lg">
+              <svg class="w-4 h-4 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <polyline points="9 21 3 21 3 15"></polyline>
+                <line x1="21" y1="3" x2="14" y2="10"></line>
+                <line x1="3" y1="21" x2="10" y2="14"></line>
+              </svg>
+            </div>
+          </div>
+          <div class="transform translate-y-1 group-hover:translate-y-0 transition-transform">
+            <span class="text-[11px] font-semibold tracking-wider text-ref-gold uppercase block mb-0.5">Exhibition & PR Events</span>
+            <h3 class="text-base sm:text-lg font-bold text-white tracking-wide">仁王3 台北國際電玩展</h3>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- Empty State (Shown when no items match) -->
+    <div id="no-results" class="hidden py-20 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#1c1c22] border border-[#2c2c34] flex items-center justify-center text-neutral-400">
+        <svg class="w-8 h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-1">查無相符案例</h3>
+      <p class="text-sm text-neutral-400">請嘗試切換其他篩選標籤查看更多內容。</p>
+    </div>
+
+  </main>
+
+  <div id="pure-lightbox" 
+       class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 transition-all duration-300 opacity-0"
+       role="dialog" 
+       aria-modal="true" 
+       aria-label="案例預覽視窗">
+
+    <!-- Top Toolbar: Case Title and Close Button -->
+    <div class="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 z-30 flex items-center justify-between pointer-events-none">
+      <div class="pointer-events-auto bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-xs sm:text-sm text-neutral-300">
+        <span id="lightbox-counter" class="text-ref-gold font-bold mr-2">1 / 6</span>
+        <span id="lightbox-caption" class="text-white font-medium">案例名稱</span>
+      </div>
+
+      <button id="close-lightbox-btn" 
+              type="button" 
+              aria-label="關閉預覽視窗" 
+              class="pointer-events-auto w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1e1e24]/90 border border-white/10 hover:border-ref-gold text-white hover:text-ref-gold flex items-center justify-center transition-all shadow-lg hover:scale-105 active:scale-95">
+        <svg class="w-5 h-5 stroke-current stroke-2" viewBox="0 0 24 24" fill="none">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Prev & Next navigation buttons -->
+    <button id="lightbox-prev" 
+            type="button" 
+            aria-label="上一張圖片" 
+            class="absolute left-3 sm:left-6 z-30 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/60 border border-white/10 hover:border-ref-gold text-white hover:text-ref-gold flex items-center justify-center transition-all backdrop-blur-md shadow-xl hover:scale-105 active:scale-95">
+      <svg class="w-6 h-6 stroke-current stroke-2" fill="none" viewBox="0 0 24 24">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <button id="lightbox-next" 
+            type="button" 
+            aria-label="下一張圖片" 
+            class="absolute right-3 sm:right-6 z-30 w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-black/60 border border-white/10 hover:border-ref-gold text-white hover:text-ref-gold flex items-center justify-center transition-all backdrop-blur-md shadow-xl hover:scale-105 active:scale-95">
+      <svg class="w-6 h-6 stroke-current stroke-2" fill="none" viewBox="0 0 24 24">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Main Visual Container -->
+    <div id="lightbox-container" class="relative max-w-6xl max-h-[85vh] w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl transform transition-transform duration-300 scale-95 flex items-center justify-center bg-black/40">
+      <img id="lightbox-img" 
+           src="" 
+           alt="案例高解析預覽" 
+           class="max-w-full max-h-[82vh] object-contain rounded-xl select-none transition-opacity duration-200">
+    </div>
+  </div>
+
+  <footer class="mt-20 border-t border-[#1c1c24] py-8 text-center text-xs text-neutral-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        © 洛和整合行銷 Raul Media. All Rights Reserved.
+      </div>
+      <div class="flex items-center gap-4 text-neutral-400">
+        <span>數位廣告投放</span>
+        <span>•</span>
+        <span>KOL / 網紅媒合</span>
+        <span>•</span>
+        <span>大型線下展演</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Configuration & Theme classes
+      const activeClass = 'bg-[#caa062] text-[#0e0e10] font-semibold shadow-md shadow-[#caa062]/25 scale-[1.02]';
+      const inactiveClass = 'bg-[#1b1b20] text-[#c4c4cc] hover:bg-[#25252c] hover:text-white font-medium';
+
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      const caseItems = Array.from(document.querySelectorAll('.case-item'));
+      const noResults = document.getElementById('no-results');
+
+      // Lightbox DOM Elements
+      const lightbox = document.getElementById('pure-lightbox');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const lightboxContainer = document.getElementById('lightbox-container');
+      const lightboxCaption = document.getElementById('lightbox-caption');
+      const lightboxCounter = document.getElementById('lightbox-counter');
+      const closeBtn = document.getElementById('close-lightbox-btn');
+      const prevBtn = document.getElementById('lightbox-prev');
+      const nextBtn = document.getElementById('lightbox-next');
+
+      let currentFilteredItems = [...caseItems];
+      let currentActiveIndex = 0;
+
+      // Update Tab Styles
+      function renderTabStyles(selectedBtn) {
+        filterButtons.forEach(btn => {
+          if (btn === selectedBtn) {
+            btn.className = `filter-btn px-5 py-2.5 rounded-full text-xs sm:text-sm transition-all duration-200 ${activeClass}`;
+          } else {
+            btn.className = `filter-btn px-5 py-2.5 rounded-full text-xs sm:text-sm transition-all duration-200 ${inactiveClass}`;
+          }
+        });
+      }
+
+      // Initialize Buttons
+      const initialActiveBtn = document.querySelector('.filter-btn.active-tab');
+      if (initialActiveBtn) renderTabStyles(initialActiveBtn);
+
+      // Filtering Click Handlers
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filterValue = btn.getAttribute('data-filter');
+          renderTabStyles(btn);
+
+          currentFilteredItems = [];
+
+          caseItems.forEach(item => {
+            const categories = item.getAttribute('data-category') || '';
+            const match = (filterValue === 'all' || categories.split(' ').includes(filterValue));
+            
+            if (match) {
+              item.classList.remove('is-hidden');
+              currentFilteredItems.push(item);
+            } else {
+              item.classList.add('is-hidden');
+            }
+          });
+
+          if (currentFilteredItems.length === 0) {
+            noResults.classList.remove('hidden');
+          } else {
+            noResults.classList.add('hidden');
+          }
+        });
+      });
+
+      // Lightbox update function
+      function showLightboxItem(index) {
+        if (!currentFilteredItems.length) return;
+        
+        // Wrap-around index
+        currentActiveIndex = (index + currentFilteredItems.length) % currentFilteredItems.length;
+        const targetCard = currentFilteredItems[currentActiveIndex];
+
+        const src = targetCard.getAttribute('data-src');
+        const title = targetCard.getAttribute('data-title') || '專案成果展示';
+
+        lightboxImg.style.opacity = '0';
+        setTimeout(() => {
+          lightboxImg.src = src;
+          lightboxCaption.textContent = title;
+          lightboxCounter.textContent = `${currentActiveIndex + 1} / ${currentFilteredItems.length}`;
+          lightboxImg.onload = () => {
+            lightboxImg.style.opacity = '1';
+          };
+          lightboxImg.onerror = () => {
+            lightboxImg.src = 'https://placehold.co/1200x800/151518/caa062?text=Preview+Image';
+            lightboxImg.style.opacity = '1';
+          };
+        }, 120);
+      }
+
+      // Open Lightbox
+      caseItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const targetIndex = currentFilteredItems.indexOf(item);
+          if (targetIndex !== -1) {
+            showLightboxItem(targetIndex);
+            lightbox.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            setTimeout(() => {
+              lightbox.classList.remove('opacity-0');
+              lightboxContainer.classList.remove('scale-95');
+            }, 20);
+          }
+        });
+      });
+
+      // Close Lightbox
+      function closeLightbox() {
+        lightbox.classList.add('opacity-0');
+        lightboxContainer.classList.add('scale-95');
+        setTimeout(() => {
+          lightbox.classList.add('hidden');
+          lightboxImg.src = '';
+          document.body.classList.remove('overflow-hidden');
+        }, 260);
+      }
+
+      // Next / Prev Actions
+      function nextLightboxItem() {
+        showLightboxItem(currentActiveIndex + 1);
+      }
+
+      function prevLightboxItem() {
+        showLightboxItem(currentActiveIndex - 1);
+      }
+
+      if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+      if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextLightboxItem(); });
+      if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevLightboxItem(); });
+
+      // Click Outside to Dismiss
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target === lightboxContainer) {
+          closeLightbox();
+        }
+      });
+
+      // Keyboard Controls
+      document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('hidden')) return;
+
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowRight') nextLightboxItem();
+        if (e.key === 'ArrowLeft') prevLightboxItem();
+      });
+
+      // Touch / Swipe Support for Mobile Devices
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      lightbox.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      lightbox.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+
+      function handleSwipe() {
+        const threshold = 45;
+        if (touchEndX < touchStartX - threshold) {
+          nextLightboxItem(); // Swiped left -> next
+        }
+        if (touchEndX > touchStartX + threshold) {
+          prevLightboxItem(); // Swiped right -> prev
+        }
+      }
+    });
+  </script>
+</body>
+</html>
