@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣財經即時戰情大看板 | TV Live Dashboard</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            warBg: '#080C14',
+            warCard: '#0f172a',
+            warCardHover: '#17223b',
+            warBorder: '#1e293b',
+            accentGold: '#f59e0b',
+            accentCyan: '#06b6d4',
+            bullRed: '#ef4444',
+            bearGreen: '#10b981',
+          },
+          fontFamily: {
+            mono: ['SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* TV Big-Screen Layout Optimizations */
+    html, body {
+      background-color: #080C14;
+      color: #f8fafc;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom High-Contrast Scrollbar for TV / Mouse / Remote navigation */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1120;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* Ultra-smooth 60FPS Continuous Hardware-Accelerated Marquee */
+    .ticker-viewport {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marqueeScroll 50s linear infinite;
+    }
+
+    .ticker-viewport:hover .ticker-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes marqueeScroll {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+
+    /* Atmospheric Glows */
+    .glow-gold {
+      box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.2);
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen justify-between bg-warBg text-slate-100 font-sans">
+
+  <!-- ================= TOP HEADER / STATUS / TV CONTROLS ================= -->
+  <header class="bg-warCard border-b-2 border-warBorder px-6 py-3 flex items-center justify-between shadow-2xl flex-shrink-0 z-30">
+    
+    <!-- Left: Title, Live Status Indicator & Source Info -->
+    <div class="flex items-center space-x-6">
+      <div class="flex items-center space-x-3.5">
+        <span class="relative flex h-5 w-5">
+          <span id="livePulsePing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span id="livePulseDot" class="relative inline-flex rounded-full h-5 w-5 bg-bearGreen"></span>
+        </span>
+        <div>
+          <h1 class="text-2xl font-black tracking-wider text-white flex items-center gap-2.5">
+            台股盤中即時戰情大看板
+            <span class="text-xs px-2.5 py-0.5 rounded bg-cyan-950/90 text-accentCyan border border-cyan-800 font-mono tracking-normal">
+              TV 4K / LIVE
+            </span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Feed Connection Status & Source Badge -->
+      <div class="flex items-center space-x-3 pl-4 border-l border-slate-700/80 text-sm">
+        <div class="flex items-center space-x-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg shadow-inner">
+          <span class="text-xs text-slate-400">當前即時源:</span>
+          <span id="feedSourceBadge" class="text-xs font-bold text-emerald-400 font-mono">連線就緒</span>
+        </div>
+        <div class="text-xs text-slate-400 font-mono">
+          自動更新倒數: <span id="countdownTimer" class="text-cyan-300 font-bold">60s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Operational Status Pill -->
+    <div class="hidden xl:flex items-center space-x-4 bg-slate-900/90 border border-slate-700/80 px-4 py-1.5 rounded-xl text-xs font-medium">
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400">總載入快訊:</span>
+        <span id="totalNewsCount" class="text-accentGold font-bold font-mono text-sm">0</span>
+      </div>
+      <span class="text-slate-600">|</span>
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400">已釘選焦點:</span>
+        <span id="headerPinnedCount" class="text-emerald-400 font-bold font-mono text-sm">0</span>
+      </div>
+      <span class="text-slate-600">|</span>
+      <div class="flex items-center space-x-2">
+        <span class="text-slate-400">狀態:</span>
+        <span id="networkStatusText" class="text-emerald-400 font-bold">連線正常</span>
+      </div>
+    </div>
+
+    <!-- Right: Operational Controls & TV Wall Clock -->
+    <div class="flex items-center space-x-4">
+      
+      <!-- Auto-refresh interval dropdown -->
+      <div class="flex items-center space-x-1.5 bg-slate-900 border border-slate-700 px-2.5 py-1.5 rounded-lg text-xs text-slate-300">
+        <span class="text-slate-400">更新週期:</span>
+        <select id="intervalSelector" onchange="changeRefreshInterval()" class="bg-slate-800 text-cyan-300 font-bold outline-none rounded px-1.5 py-0.5 cursor-pointer">
+          <option value="30">30 秒</option>
+          <option value="60" selected>60 秒</option>
+          <option value="120">2 分鐘</option>
+          <option value="300">5 分鐘</option>
+        </select>
+      </div>
+
+      <!-- Manual Force Refresh -->
+      <button onclick="triggerManualFetch()" title="立即同步外部即時新聞" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-600 rounded-lg text-slate-200 transition flex items-center gap-1.5 text-xs font-bold shadow">
+        <svg id="refreshSpinner" class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        <span>即刻同步</span>
+      </button>
+
+      <!-- Web Audio Alarm Sound Toggle -->
+      <button onclick="toggleSound()" id="soundBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow">
+        <span id="soundIcon">🔔</span>
+        <span id="soundLabel">提示音: 開</span>
+      </button>
+
+      <!-- Full-screen Button (Essential for Smart TV / OBS) -->
+      <button onclick="toggleFullscreen()" title="切換電視全螢幕 (F11)" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-cyan-300 transition shadow">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+        </svg>
+      </button>
+
+      <!-- TV Big Digital Clock -->
+      <div class="text-right pl-3.5 border-l border-slate-700">
+        <div id="liveDate" class="text-xs font-semibold text-slate-400">----/--/--</div>
+        <div id="liveClock" class="text-2xl font-black font-mono tracking-wider text-cyan-400 leading-none mt-0.5">00:00:00</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN TWO-COLUMN TV WAR ROOM DISPLAY ================= -->
+  <main class="flex-1 grid grid-cols-12 gap-5 p-5 overflow-hidden">
+    
+    <!-- LEFT PANEL: PINNED KEY HEADLINES (48% Focus Column) -->
+    <section class="col-span-12 lg:col-span-6 flex flex-col bg-warCard border-2 border-slate-800 rounded-2xl p-5 shadow-2xl overflow-hidden glow-gold">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800/90 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <span class="text-2xl text-accentGold">📌</span>
+          <h2 class="text-2xl font-black tracking-wide text-white">重點頭條釘選看板</h2>
+          <span id="pinnedBadge" class="text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/50">
+            0 則焦點
+          </span>
+        </div>
+        <div class="text-xs text-slate-400 font-medium">
+          常駐鎖定區・優先進跑馬燈・點擊卡片取消釘選
+        </div>
+      </div>
+
+      <!-- Pinned Scrollable Container -->
+      <div id="pinnedContainer" class="flex-1 overflow-y-auto mt-4 space-y-4 pr-1.5">
+        <!-- Pinned news rendered by JS -->
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: LIVE STREAM & QUICK DISPATCH (52% Realtime Stream) -->
+    <section class="col-span-12 lg:col-span-6 flex flex-col bg-warCard border-2 border-slate-800 rounded-2xl p-5 shadow-2xl overflow-hidden glow-cyan">
+      
+      <!-- Top: Quick Dispatch / Manual Note Bar -->
+      <div class="pb-3 border-b border-slate-800/90 flex-shrink-0">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-2.5">
+            <span class="text-xl text-accentCyan">⚡</span>
+            <h2 class="text-xl font-bold tracking-wide text-white">即時台灣財經資訊流</h2>
+            <span id="streamCountBadge" class="text-xs bg-cyan-950 text-cyan-300 border border-cyan-800 px-2 py-0.2 rounded-full font-mono">
+              0 則
+            </span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono" id="lastUpdatedTime">上次同步: --:--:--</span>
+        </div>
+
+        <!-- Quick Manual Note / Critical Broadcast Input -->
+        <div class="flex gap-2">
+          <select id="manualTagSelect" class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg px-2.5 py-1.5 outline-none font-bold">
+            <option value="重大">🚨 重大快訊</option>
+            <option value="權值">🏛️ 權值動向</option>
+            <option value="總經">🌐 總經政策</option>
+            <option value="產業">💼 產業焦點</option>
+            <option value="備忘">📝 操盤備忘</option>
+          </select>
+          <input type="text" id="manualTextInput" placeholder="輸入個人手動備忘或盤中緊急筆記..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-100 placeholder-slate-500 text-sm outline-none focus:border-cyan-500 transition">
+          <button onclick="handleManualBroadcast()" class="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white font-bold rounded-lg text-sm transition flex-shrink-0 shadow-lg">
+            發布置頂
+          </button>
+        </div>
+      </div>
+
+      <!-- Realtime Stream Scrollable Container -->
+      <div id="streamContainer" class="flex-1 overflow-y-auto mt-3.5 space-y-3 pr-1.5">
+        <!-- Live stream items rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= BOTTOM FULL-WIDTH SEAMLESS TV MARQUEE ================= -->
+  <footer class="bg-slate-950 border-t-2 border-slate-800 h-20 flex items-center px-6 relative shadow-2xl flex-shrink-0 z-30">
+    <!-- Static Leading Badge -->
+    <div class="flex items-center space-x-2 bg-bullRed text-white font-black text-lg px-4 py-2 rounded-xl flex-shrink-0 mr-5 shadow-lg uppercase tracking-wider">
+      <span class="animate-pulse">●</span>
+      <span>即時跑馬燈</span>
+    </div>
+
+    <!-- Infinite Continuous Marquee Viewport -->
+    <div class="flex-1 overflow-hidden relative ticker-viewport">
+      <div id="tickerTrack" class="ticker-track flex items-center">
+        <!-- Dynamic marquee items injected here -->
+      </div>
+    </div>
+
+    <!-- Ticker Rate & Pause Controls -->
+    <div class="flex items-center space-x-2.5 ml-5 pl-4 border-l border-slate-800 flex-shrink-0">
+      <button onclick="toggleTickerPause()" id="tickerPauseBtn" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-slate-200 text-xs font-semibold transition">
+        暫停
+      </button>
+      <div class="flex items-center space-x-1 bg-slate-900 border border-slate-800 rounded-lg p-0.5">
+        <button onclick="setTickerSpeed(75)" class="px-2 py-0.5 text-xs rounded hover:bg-slate-800 text-slate-400">慢</button>
+        <button onclick="setTickerSpeed(50)" class="px-2 py-0.5 text-xs rounded bg-slate-800 font-bold text-accentCyan">中</button>
+        <button onclick="setTickerSpeed(30)" class="px-2 py-0.5 text-xs rounded hover:bg-slate-800 text-slate-400">快</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= CLIENT JAVASCRIPT LOGIC ================= -->
+  <script>
+    /**
+     * =========================================================================
+     * 1. API CONFIGURATION BLOCK
+     * Customize your RSS Feeds, API Keys, or CORS proxies here.
+     * When deploying to GitHub Pages or Netlify, this works directly out of the box.
+     * =========================================================================
+     */
+    const CONFIG = {
+      // Optional: Get a free API Key from https://rss2json.com/ (allows 10,000 req/mo without rate limits)
+      // Leave empty string "" to use the public tier.
+      RSS2JSON_API_KEY: "",
+
+      // Target Taiwan Financial RSS Feeds
+      TARGET_FEEDS: [
+        {
+          id: "google_tw_finance",
+          name: "Google News 台灣財經",
+          url: "https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=zh-TW&gl=TW&ceid=TW:zh-Hant"
+        },
+        {
+          id: "yahoo_tw_stock",
+          name: "Yahoo 奇摩股市焦點",
+          url: "https://tw.stock.yahoo.com/rss?category=intl-markets"
+        }
+      ],
+
+      // Default refresh interval in seconds
+      DEFAULT_REFRESH_SECONDS: 60
+    };
+
+    /**
+     * =========================================================================
+     * 2. STATE MANAGEMENT & RISK TAG MAPPING
+     * =========================================================================
+     */
+    let newsArticles = [];
+    let refreshSeconds = CONFIG.DEFAULT_REFRESH_SECONDS;
+    let countdownRemaining = CONFIG.DEFAULT_REFRESH_SECONDS;
+    let countdownIntervalId = null;
+    let currentFeedIndex = 0;
+    let isFetching = false;
+
+    // Severity & Category Badge Styling
+    const tagStyleMap = {
+      "重大": "bg-red-500/20 text-red-400 border border-red-500/50",
+      "權值": "bg-amber-500/20 text-amber-300 border border-amber-500/50",
+      "總經": "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50",
+      "產業": "bg-emerald-500/20 text-emerald-300 border border-emerald-500/50",
+      "備忘": "bg-purple-500/20 text-purple-300 border border-purple-500/50",
+    };
+
+    // Keyword Analyzer to categorize Taiwan market news
+    function categorizeNews(title = "", snippet = "") {
+      const text = title + " " + snippet;
+      if (/急跌|重挫|殺盤|跌破|大跌|破底|崩盤|暴跌|慘跌|恐慌|緊急|跌停/.test(text)) {
+        return "重大";
+      }
+      if (/台積電|聯發科|鴻海|廣達|外資|投信|主力|自營商|三大法人|空單|持股/.test(text)) {
+        return "權值";
+      }
+      if (/央行|降息|升息|通膨|Fed|美聯準|關稅|貿易戰|地緣|政策|國安基金|CPI/.test(text)) {
+        return "總經";
+      }
+      return "產業";
+    }
+
+    function cleanHtmlText(raw) {
+      if (!raw) return "";
+      const doc = new DOMParser().parseFromString(raw, "text/html");
+      return (doc.body.textContent || "").trim();
+    }
+
+    /**
+     * =========================================================================
+     * 3. WEB AUDIO ALERT SYNTHESIZER
+     * Native browser audio tone for breakings (Zero external mp3 files)
+     * =========================================================================
+     */
+    let audioContext = null;
+    let isSoundMuted = false;
+
+    function playAudioTone(frequency = 880, type = 'sine', duration = 0.15) {
+      if (isSoundMuted) return;
+      try {
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+      } catch (err) {
+        console.warn("Audio playback interaction prevented:", err);
+      }
+    }
+
+    function toggleSound() {
+      isSoundMuted = !isSoundMuted;
+      document.getElementById('soundLabel').textContent = isSoundMuted ? '提示音: 靜音' : '提示音: 開';
+      document.getElementById('soundIcon').textContent = isSoundMuted ? '🔕' : '🔔';
+      document.getElementById('soundBtn').classList.toggle('border-amber-600', !isSoundMuted);
+      if (!isSoundMuted) playAudioTone(950, 'sine', 0.12);
+    }
+
+    /**
+     * =========================================================================
+     * 4. LIVE API RSS-TO-JSON FETCHER WITH AUTO-FAILOVER
+     * =========================================================================
+     */
+    async function fetchLiveTaiwanNews() {
+      if (isFetching) return;
+      isFetching = true;
+
+      const spinner = document.getElementById("refreshSpinner");
+      const badge = document.getElementById("feedSourceBadge");
+      const statusText = document.getElementById("networkStatusText");
+      const pulseDot = document.getElementById("livePulseDot");
+      const pulsePing = document.getElementById("livePulsePing");
+
+      spinner.classList.add("animate-spin");
+      badge.textContent = "連線更新中...";
+      badge.className = "text-xs font-bold text-amber-400 font-mono";
+
+      let success = false;
+      let rawItems = [];
+      let activeFeed = CONFIG.TARGET_FEEDS[currentFeedIndex];
+
+      // Try current feed, and if failed, try next feed
+      for (let attempt = 0; attempt < CONFIG.TARGET_FEEDS.length; attempt++) {
+        activeFeed = CONFIG.TARGET_FEEDS[currentFeedIndex];
+        try {
+          let apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(activeFeed.url)}`;
+          if (CONFIG.RSS2JSON_API_KEY) {
+            apiUrl += `&api_key=${encodeURIComponent(CONFIG.RSS2JSON_API_KEY)}`;
+          }
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
+          const response = await fetch(apiUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.items && data.items.length > 0) {
+              rawItems = data.items;
+              success = true;
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`Feed ${activeFeed.name} fetch failed, failing over to next feed:`, err);
+          // Failover to next feed index
+          currentFeedIndex = (currentFeedIndex + 1) % CONFIG.TARGET_FEEDS.length;
+        }
+      }
+
+      spinner.classList.remove("animate-spin");
+      isFetching = false;
+
+      if (success && rawItems.length > 0) {
+        // Connection success: Update badges
+        badge.textContent = `${activeFeed.name} (即時串流)`;
+        badge.className = "text-xs font-bold text-emerald-400 font-mono";
+        statusText.textContent = "即時連線中";
+        statusText.className = "text-emerald-400 font-bold";
+        pulseDot.className = "relative inline-flex rounded-full h-5 w-5 bg-bearGreen";
+        pulsePing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+
+        integrateIncomingData(rawItems, activeFeed.name);
+      } else {
+        // Fallover failed (e.g. Offline / CORS blocked)
+        badge.textContent = "外部連線受限 (保持目前內容)";
+        badge.className = "text-xs font-bold text-bullRed font-mono";
+        statusText.textContent = "待命中 (重試中)";
+        statusText.className = "text-amber-400 font-bold";
+        pulseDot.className = "relative inline-flex rounded-full h-5 w-5 bg-bullRed";
+        pulsePing.className = "hidden";
+      }
+
+      // Update timestamp and reset countdown
+      const now = new Date();
+      document.getElementById("lastUpdatedTime").textContent = `上次同步: ${now.toTimeString().split(' ')[0]}`;
+      countdownRemaining = refreshSeconds;
+    }
+
+    // Merge fetched RSS items into current memory, preserving pinned status
+    function integrateIncomingData(items, sourceName) {
+      const existingPinnedMap = new Map();
+      newsArticles.forEach(item => {
+        if (item.pinned) existingPinnedMap.set(item.id, item);
+      });
+
+      const formatted = items.map((item, index) => {
+        const id = "rss_" + (item.guid || item.link || (sourceName + "_" + index));
+        const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
+        const timeStr = !isNaN(pubDate.getTime()) 
+          ? `${String(pubDate.getHours()).padStart(2, '0')}:${String(pubDate.getMinutes()).padStart(2, '0')}:${String(pubDate.getSeconds()).padStart(2, '0')}`
+          : new Date().toTimeString().split(' ')[0];
+
+        const title = cleanHtmlText(item.title);
+        const snippet = cleanHtmlText(item.description || item.content || "").slice(0, 140) + "...";
+        const tag = categorizeNews(title, snippet);
+
+        const wasPinned = existingPinnedMap.has(id);
+        const initialAutoPin = newsArticles.length === 0 && index < 2; // Auto-pin top 2 on very first load
+
+        return {
+          id: id,
+          time: timeStr,
+          tag: tag,
+          title: title,
+          snippet: snippet,
+          link: item.link || "#",
+          source: sourceName,
+          pinned: wasPinned || initialAutoPin
+        };
+      });
+
+      // Keep user manually-created broadcasts if any
+      const userBroadcasts = newsArticles.filter(n => n.id.startsWith("usr_"));
+      newsArticles = [...userBroadcasts, ...formatted];
+
+      renderAllViews();
+      playAudioTone(800, 'sine', 0.12);
+    }
+
+    /**
+     * =========================================================================
+     * 5. RENDERING ENGINES (PINNED, LIVE STREAM, BOTTOM MARQUEE)
+     * =========================================================================
+     */
+
+    // Render Left Panel: Pinned Key Headlines
+    function renderPinnedPanel() {
+      const container = document.getElementById("pinnedContainer");
+      const pinnedItems = newsArticles.filter(n => n.pinned);
+
+      document.getElementById("pinnedBadge").textContent = `${pinnedItems.length} 則焦點`;
+      document.getElementById("headerPinnedCount").textContent = pinnedItems.length;
+
+      if (pinnedItems.length === 0) {
+        container.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-800 rounded-2xl p-6 text-center">
+            <span class="text-5xl mb-3 opacity-60">📌</span>
+            <span class="text-xl font-bold text-slate-300">尚未置頂重點頭條</span>
+            <span class="text-sm text-slate-500 mt-1">點擊右側情報流的「★ 釘選」或在上方輸入個人備忘發布</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pinnedItems.map(item => `
+        <article class="bg-slate-900/90 border-2 border-amber-500/40 hover:border-amber-400 rounded-xl p-5 shadow-2xl transition duration-150">
+          <div class="flex items-center justify-between mb-2.5">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-md ${tagStyleMap[item.tag] || tagStyleMap['產業']}">
+                【${item.tag}】
+              </span>
+              <span class="text-accentGold text-xs font-black tracking-wider flex items-center gap-1">
+                ⭐ 置頂常駐
+              </span>
+              <span class="text-[11px] text-slate-400 font-mono bg-slate-800 px-2 py-0.5 rounded">
+                ${item.source || '即時速報'}
+              </span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="text-slate-400 font-mono text-xs">${item.time}</span>
+              <button onclick="togglePin('${item.id}')" title="取消釘選" class="px-2.5 py-1 bg-slate-800 hover:bg-red-950 hover:text-red-300 border border-slate-700 rounded text-slate-300 text-xs transition">
+                ✕ 取消置頂
+              </button>
+            </div>
+          </div>
+          <h3 class="text-2xl font-black text-white leading-tight tracking-wide mb-2 hover:text-amber-200 cursor-pointer" onclick="togglePin('${item.id}')">
+            ${item.title}
+          </h3>
+          <p class="text-base text-slate-300 leading-relaxed font-medium">
+            ${item.snippet || ''}
+          </p>
+        </article>
+      `).join("");
+    }
+
+    // Render Right Panel: Real-time Chronological Stream
+    function renderStreamPanel() {
+      const container = document.getElementById("streamContainer");
+      document.getElementById("streamCountBadge").textContent = `${newsArticles.length} 則`;
+      document.getElementById("totalNewsCount").textContent = newsArticles.length;
+
+      container.innerHTML = newsArticles.map(item => `
+        <div class="p-3.5 bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-xl flex flex-col space-y-1.5 transition shadow">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded ${tagStyleMap[item.tag] || tagStyleMap['產業']}">
+                ${item.tag}
+              </span>
+              <span class="text-slate-400 font-mono text-xs">${item.time}</span>
+              <span class="text-[10px] text-slate-500 font-mono">${item.source || ''}</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="togglePin('${item.id}')" class="px-2.5 py-1 text-xs rounded font-bold border transition ${
+                item.pinned 
+                  ? 'bg-amber-950 text-amber-300 border-amber-600 hover:bg-amber-900' 
+                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+              }">
+                ${item.pinned ? '★ 已釘選' : '☆ 釘選'}
+              </button>
+              <button onclick="deleteItem('${item.id}')" class="text-slate-500 hover:text-red-400 px-1 text-xs" title="刪除此則">
+                ✕
+              </button>
+            </div>
+          </div>
+          <p class="text-base font-bold text-slate-100 leading-snug">
+            ${item.title}
+          </p>
+          ${item.snippet ? `<p class="text-xs text-slate-400 line-clamp-2">${item.snippet}</p>` : ''}
+        </div>
+      `).join("");
+    }
+
+    // Render Bottom Dual-Track Continuous Marquee (Pinned headlines first)
+    function renderMarquee() {
+      const track = document.getElementById("tickerTrack");
+      if (newsArticles.length === 0) {
+        track.innerHTML = `<span class="text-slate-500 font-bold text-lg px-6">連線初始化中，等待首批最新情報...</span>`;
+        return;
+      }
+
+      // Priority sort: Pinned headlines first, then latest items
+      const marqueeItems = [
+        ...newsArticles.filter(n => n.pinned),
+        ...newsArticles.filter(n => !n.pinned)
+      ].slice(0, 12);
+
+      const htmlContent = marqueeItems.map(item => `
+        <div class="inline-flex items-center mr-10 text-xl font-bold tracking-wide">
+          <span class="font-mono text-cyan-400 mr-2 text-lg">[${item.time.slice(0, 5)}]</span>
+          <span class="px-2 py-0.5 rounded text-xs mr-2.5 ${tagStyleMap[item.tag] || tagStyleMap['產業']}">
+            ${item.tag}
+          </span>
+          <span class="text-slate-100 hover:text-amber-300 transition cursor-pointer" onclick="togglePin('${item.id}')">
+            ${item.title}
+          </span>
+          <span class="mx-5 text-slate-600 font-light">•</span>
+        </div>
+      `).join("");
+
+      // Duplicate content to achieve 100% infinite seamless loop (-50% transform)
+      track.innerHTML = htmlContent + htmlContent;
+    }
+
+    function renderAllViews() {
+      renderPinnedPanel();
+      renderStreamPanel();
+      renderMarquee();
+    }
+
+    /**
+     * =========================================================================
+     * 6. USER INTERACTIONS & SHORTCUTS
+     * =========================================================================
+     */
+    function togglePin(id) {
+      const item = newsArticles.find(n => n.id === id);
+      if (item) {
+        item.pinned = !item.pinned;
+        renderAllViews();
+        playAudioTone(item.pinned ? 900 : 500, 'sine', 0.1);
+      }
+    }
+
+    function deleteItem(id) {
+      newsArticles = newsArticles.filter(n => n.id !== id);
+      renderAllViews();
+    }
+
+    function triggerManualFetch() {
+      fetchLiveTaiwanNews();
+      playAudioTone(1050, 'sine', 0.1);
+    }
+
+    function handleManualBroadcast() {
+      const input = document.getElementById("manualTextInput");
+      const tagSelect = document.getElementById("manualTagSelect");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+
+      const manualEntry = {
+        id: "usr_" + Date.now(),
+        time: timeStr,
+        tag: tagSelect.value,
+        title: text,
+        snippet: "操盤室手動即時廣播發布",
+        link: "#",
+        source: "手動發布",
+        pinned: true // Manual broadcasts default to pinned on TV wall
+      };
+
+      newsArticles.unshift(manualEntry);
+      input.value = "";
+      renderAllViews();
+      playAudioTone(1200, 'triangle', 0.25);
+    }
+
+    document.getElementById("manualTextInput").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleManualBroadcast();
+    });
+
+    // Clock and countdown loop
+    function updateClockAndCountdown() {
+      const now = new Date();
+      const yr = now.getFullYear();
+      const mo = String(now.getMonth() + 1).padStart(2, '0');
+      const da = String(now.getDate()).padStart(2, '0');
+      const days = ['日', '一', '二', '三', '四', '五', '六'];
+      document.getElementById("liveDate").textContent = `${yr}/${mo}/${da} (${days[now.getDay()]})`;
+
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById("liveClock").textContent = `${h}:${m}:${s}`;
+
+      countdownRemaining--;
+      if (countdownRemaining <= 0) {
+        countdownRemaining = refreshSeconds;
+        fetchLiveTaiwanNews();
+      }
+      document.getElementById("countdownTimer").textContent = `${countdownRemaining}s`;
+    }
+
+    function changeRefreshInterval() {
+      const select = document.getElementById("intervalSelector");
+      refreshSeconds = parseInt(select.value, 10);
+      countdownRemaining = refreshSeconds;
+    }
+
+    // Full-screen Toggle for TV Browsers
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn("Fullscreen permission denied:", err);
+        });
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // Marquee Controls
+    let isTickerPaused = false;
+    function toggleTickerPause() {
+      const track = document.getElementById("tickerTrack");
+      const btn = document.getElementById("tickerPauseBtn");
+      isTickerPaused = !isTickerPaused;
+      track.style.animationPlayState = isTickerPaused ? 'paused' : 'running';
+      btn.textContent = isTickerPaused ? '播放' : '暫停';
+      btn.classList.toggle('bg-amber-600', isTickerPaused);
+    }
+
+    function setTickerSpeed(seconds) {
+      const track = document.getElementById("tickerTrack");
+      track.style.animationDuration = `${seconds}s`;
+    }
+
+    // Lifecycle Start
+    window.onload = function() {
+      fetchLiveTaiwanNews();
+      setInterval(updateClockAndCountdown, 1000);
+      updateClockAndCountdown();
+    };
+  </script>
+</body>
+</html>
